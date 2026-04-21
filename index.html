@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Retro Droid Launcher</title>
+    <style>
+        :root {
+            --bg-teal: #008080;
+            --silver: #c0c0c0;
+            --white: #ffffff;
+            --dark-gray: #808080;
+            --black: #050505;
+            --win-blue: #000080;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-teal);
+            overflow: hidden;
+            color: var(--black);
+        }
+
+        /* Desktop Grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 90px;
+            gap: 15px;
+            padding: 20px;
+            height: calc(100% - 50px);
+            align-content: start;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .app-icon img {
+            width: 42px;
+            height: 42px;
+            image-rendering: pixelated;
+            background: var(--silver);
+            border: 2px solid;
+            border-color: var(--white) var(--dark-gray) var(--dark-gray) var(--white);
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+
+        .app-icon:active img {
+            border-color: var(--dark-gray) var(--white) var(--white) var(--dark-gray);
+            transform: translate(1px, 1px);
+        }
+
+        .app-icon span {
+            font-size: 10px;
+            color: var(--white);
+            text-shadow: 1px 1px var(--black);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Taskbar / Barra de Navegação */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 45px;
+            background: var(--silver);
+            border-top: 2px solid var(--white);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0 -2px 0 var(--dark-gray);
+            z-index: 100;
+        }
+
+        .btn-start {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border: 2px solid;
+            border-color: var(--white) var(--dark-gray) var(--dark-gray) var(--white);
+            font-weight: bold;
+            font-size: 14px;
+            background: var(--silver);
+        }
+
+        .btn-start:active {
+            border-color: var(--dark-gray) var(--white) var(--white) var(--dark-gray);
+        }
+
+        .system-tray {
+            margin-left: auto;
+            border: 2px inset var(--white);
+            padding: 2px 8px;
+            background: var(--silver);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Janelas de App */
+        .window {
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            width: 90%;
+            height: 70%;
+            background: var(--silver);
+            border: 2px solid;
+            border-color: var(--white) var(--dark-gray) var(--dark-gray) var(--white);
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+
+        .window-header {
+            background: var(--win-blue);
+            color: white;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .close-btn {
+            background: var(--silver);
+            border: 1px solid;
+            border-color: var(--white) var(--dark-gray) var(--dark-gray) var(--white);
+            width: 18px;
+            height: 18px;
+            text-align: center;
+            line-height: 14px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .window-content {
+            padding: 10px;
+            background: white;
+            margin: 3px;
+            flex-grow: 1;
+            border: 2px inset var(--silver);
+            overflow-y: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="grid-container">
+    <div class="app-icon" onclick="openApp('Telefone')">
+        <img src="https://img.icons8.com/color/48/000000/phone.png" alt="phone">
+        <span>Telefone</span>
+    </div>
+    <div class="app-icon" onclick="openApp('Mensagens')">
+        <img src="https://img.icons8.com/color/48/000000/filled-message.png" alt="msg">
+        <span>SMS</span>
+    </div>
+    <div class="app-icon" onclick="openApp('Câmera')">
+        <img src="https://img.icons8.com/color/48/000000/camera.png" alt="cam">
+        <span>Câmera</span>
+    </div>
+    <div class="app-icon" onclick="openApp('Configurações')">
+        <img src="https://img.icons8.com/color/48/000000/settings.png" alt="settings">
+        <span>Setup</span>
+    </div>
+</div>
+
+<div id="app-window" class="window">
+    <div class="window-header">
+        <span id="window-title">App</span>
+        <div class="close-btn" onclick="closeApp()">X</div>
+    </div>
+    <div class="window-content" id="app-body">
+        Carregando...
+    </div>
+</div>
+
+<div class="taskbar">
+    <div class="btn-start">
+        <img src="https://img.icons8.com/color/20/000000/android-os.png" alt="start">
+        Apps
+    </div>
+    <div class="system-tray" id="clock">15:55</div>
+</div>
+
+<script>
+    function openApp(name) {
+        const win = document.getElementById('app-window');
+        document.getElementById('window-title').innerText = name;
+        document.getElementById('app-body').innerHTML = `<p>Bem-vindo ao app: <strong>${name}</strong></p><p>Versão 1.0.26 Beta</p>`;
+        win.style.display = 'flex';
+    }
+
+    function closeApp() {
+        document.getElementById('app-window').style.display = 'none';
+    }
+
+    function updateTime() {
+        const now = new Date();
+        const timeStr = now.getHours().toString().padStart(2, '0') + ":" + 
+                        now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('clock').innerText = timeStr;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+</script>
+
+</body>
+</html>
